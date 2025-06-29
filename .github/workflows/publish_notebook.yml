@@ -31,22 +31,44 @@ jobs:
               run: |
                   python -m pip install --upgrade pip
                   pip install marimo anywidget traitlets
+                  # Also install build tools for pyproject.toml
+                  pip install build setuptools wheel
 
             - name: 🔧 Install local motimer package
               run: |
-                  # Install in editable mode using the setup.py we created
-                  pip install -e .
+                  # Try editable install first
+                  pip install -e . || {
+                      echo "Editable install failed, trying alternative approaches..."
+                      
+                      # Try building and installing
+                      python -m build
+                      pip install dist/*.whl || {
+                          echo "Build install failed, using PYTHONPATH..."
+                          echo "PYTHONPATH=$PWD:$PYTHONPATH" >> $GITHUB_ENV
+                      }
+                  }
                   
-                  # Alternative: Add current directory to Python path
-                  # echo "PYTHONPATH=$PWD:$PYTHONPATH" >> $GITHUB_ENV
+                  # Debug: Show installed packages
+                  pip list | grep motimer || echo "motimer not found in pip list"
+                  
+                  # Debug: Show Python path and working directory
+                  echo "Working directory: $(pwd)"
+                  echo "Python path: $PYTHONPATH"
+                  ls -la motimer/
 
             - name: 🧪 Test import
               run: |
-                  python -c "from motimer import TimerWidget, StopwatchWidget; print('Import successful!')"
+                  # First try normal import
+                  python -c "from motimer import TimerWidget, StopwatchWidget; print('Import successful!')" || {
+                      echo "Normal import failed, trying with PYTHONPATH..."
+                      PYTHONPATH=$PWD:$PYTHONPATH python -c "from motimer import TimerWidget, StopwatchWidget; print('Import with PYTHONPATH successful!')"
+                  }
 
             - name: 📄 Export notebook
               run: |
                   mkdir -p dist
+                  # Set PYTHONPATH to ensure motimer can be imported
+                  export PYTHONPATH=$PWD:$PYTHONPATH
                   marimo export html-wasm demo.py -o dist/index.html --mode run
 
             - name: 📦 Upload Pages Artifact
