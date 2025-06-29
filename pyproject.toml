@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "motimer"
 version = "0.1.0"
-description = "A beautiful timer and stopwatch widget for marimo notebooks"
+description = "A timer and stopwatch widget for marimo notebooks"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
-    {name = "Sam Parmar", email = "your.email@example.com"}
+    {name = "Sam Parmar"}
 ]
 requires-python = ">=3.8"
 dependencies = [
@@ -17,9 +17,8 @@ dependencies = [
     "traitlets",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Operating System :: OS Independent",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
