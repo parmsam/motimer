@@ -40,6 +40,8 @@ jobs:
             - name: 📄 Export notebook
               run: |
                   mkdir -p dist
+                  # Copy motimer module to dist for fallback import support
+                  cp -r motimer dist/
                   marimo export html-wasm demo.py -o dist/index.html --mode edit
 
             - name: 📦 Upload Pages Artifact
