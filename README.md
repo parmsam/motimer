@@ -23,10 +23,8 @@ Then clone or install the motimer package:
 # If published to PyPI (replace with actual package name if different)
 # pip install motimer
 
-# Or install from source
-git clone https://github.com/parmsam/motimer
-cd motimer
-pip install -e .
+# Or install from Github repository (development version)
+pip install git+https://github.com/parmsam/motimer.git
 ```
 
 ## Usage
