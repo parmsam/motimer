@@ -1,6 +1,6 @@
 # motimer
 
-A beautiful timer and stopwatch widget built with [marimo](https://marimo.io/) for interactive Python notebooks.
+An anywidget timer and stopwatch built for [marimo](https://marimo.io/) for interactive Python notebooks. Useful for productivity, time management, trainings, and interactive demos.
 
 ## Features
 
@@ -33,6 +33,8 @@ pip install -e .
 
 ### Timer Widget
 
+![](images/result_timer.png)
+
 ```python
 import marimo as mo
 from motimer import TimerWidget
@@ -56,6 +58,8 @@ timer_ui
 ```
 
 ### Stopwatch Widget
+
+![](images/result_stopwatch.png)
 
 ```python
 import marimo as mo
