@@ -1,3 +1,6 @@
 __marimo__
 __pycache__
 dev.py
+dist
+build
+*egg-info

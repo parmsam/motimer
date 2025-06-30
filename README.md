@@ -14,14 +14,7 @@ An anywidget timer and stopwatch built for [marimo](https://marimo.io/) for inte
 ## Installation
 
 ```bash
-pip install marimo anywidget
-```
-
-Then clone or install the motimer package:
-
-```bash
-# If published to PyPI (replace with actual package name if different)
-# pip install motimer
+pip install motimer
 
 # Or install from Github repository (development version)
 pip install git+https://github.com/parmsam/motimer.git
@@ -31,7 +24,7 @@ pip install git+https://github.com/parmsam/motimer.git
 
 ### Timer Widget
 
-![](images/result_timer.jpg)
+![](https://github.com/parmsam/motimer/raw/main/images/result_timer.jpg)
 
 ```python
 import marimo as mo
@@ -57,7 +50,7 @@ timer_ui
 
 ### Stopwatch Widget
 
-![](images/result_stopwatch.jpg)
+![](https://github.com/parmsam/motimer/raw/main/images/result_stopwatch.jpg)
 
 ```python
 import marimo as mo
@@ -92,19 +85,6 @@ mo.md(f"""
 - Is running: {stopwatch.is_running}
 """)
 ```
-
-## Development
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   pip install marimo anywidget traitlets
-   ```
-3. Run the development notebook:
-   ```bash
-   marimo run dev.py
-   ```
-4. Test your changes and create new widgets as needed
 
 ## Widget Features
 
