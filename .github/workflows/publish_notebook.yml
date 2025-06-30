@@ -40,11 +40,38 @@ jobs:
             - name: 📄 Export notebook
               run: |
                   mkdir -p output
-                  # Copy motimer module to output for fallback import support
-                  cp -r motimer output/
                   # Add .nojekyll to prevent GitHub from interfering with the site
                   touch output/.nojekyll
+                  
+                  # Export the notebook to WASM HTML
                   marimo export html-wasm demo.py -o output --mode edit
+                  
+                  # Copy motimer module to output for fallback import support
+                  # This needs to be done after export to ensure it's available for WASM
+                  cp -r motimer output/assets
+                  
+                  # Debug: List all files created by the export
+                  echo "Files created in output directory:"
+                  ls -la output/
+                  echo "Checking for assets directory:"
+                  if [ -d "output/assets" ]; then
+                      echo "Assets directory found:"
+                      ls -la output/assets/
+                  else
+                      echo "No assets directory found - this might cause issues"
+                      echo "Creating assets directory and checking if we need to copy anything..."
+                      mkdir -p output/assets
+                  fi
+                  
+                  # Verify the main HTML file exists
+                  if [ -f "output/demo.html" ]; then
+                      echo "Main HTML file found: demo.html"
+                  elif [ -f "output/index.html" ]; then
+                      echo "Main HTML file found: index.html"
+                  else
+                      echo "Warning: No main HTML file found"
+                      ls -la output/*.html || echo "No HTML files found"
+                  fi
 
             - name: 📦 Upload Pages Artifact
               uses: actions/upload-pages-artifact@v3
