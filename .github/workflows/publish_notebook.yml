@@ -39,15 +39,17 @@ jobs:
 
             - name: 📄 Export notebook
               run: |
-                  mkdir -p dist
-                  # Copy motimer module to dist for fallback import support
-                  cp -r motimer dist/
-                  marimo export html-wasm demo.py -o dist/index.html --mode edit
+                  mkdir -p output
+                  # Copy motimer module to output for fallback import support
+                  cp -r motimer output/
+                  # Add .nojekyll to prevent GitHub from interfering with the site
+                  touch output/.nojekyll
+                  marimo export html-wasm demo.py -o output --mode edit
 
             - name: 📦 Upload Pages Artifact
               uses: actions/upload-pages-artifact@v3
               with:
-                  path: dist
+                  path: output
 
     deploy:
         needs: build
@@ -64,3 +66,5 @@ jobs:
             - name: 🌐 Deploy to GitHub Pages
               id: deployment
               uses: actions/deploy-pages@v4
+              with:
+                  artifact_name: github-pages
