@@ -1,5 +1,5 @@
 """
-mopad - An anywidget that allows gamepad input in Marimo
+motimer - An anywidget that adds a timer or stopwatch in Marimo
 """
 
 from .widget import TimerWidget, StopwatchWidget
