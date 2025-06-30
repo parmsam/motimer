@@ -1,6 +1,6 @@
 # motimer
 
-An anywidget timer and stopwatch built for [marimo](https://marimo.io/) for interactive Python notebooks. Useful for productivity, time management, trainings, and interactive demos.
+An anywidget timer and stopwatch built for [marimo](https://marimo.io/) notebooks. Useful for productivity, time management, trainings, and interactive demos.
 
 ## Features
 
