@@ -31,7 +31,7 @@ pip install git+https://github.com/parmsam/motimer.git
 
 ### Timer Widget
 
-![](images/result_timer.png)
+![](images/result_timer.jpg)
 
 ```python
 import marimo as mo
@@ -57,7 +57,7 @@ timer_ui
 
 ### Stopwatch Widget
 
-![](images/result_stopwatch.png)
+![](images/result_stopwatch.jpg)
 
 ```python
 import marimo as mo
