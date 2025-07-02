@@ -17,11 +17,18 @@ def _(TimerWidget, mo):
     # Create timer with custom initial time
     timer = TimerWidget() # Default is 5 minutes
     timer = TimerWidget(initial_time=600) # Will show 10 minutes
-    timer.set_time(hours=0, minutes=0, seconds=2)  # Will now show 2 minutes 
+    timer.set_time(hours=0, minutes=0, seconds=10)  # Will now show 10 seconds 
     timer.theme = 'light'  
     timer = mo.ui.anywidget(timer)
     timer
     return (timer,)
+
+
+@app.cell
+def _(timer):
+    timer.reset()
+    timer.start()
+    return
 
 
 @app.cell
@@ -47,13 +54,9 @@ def _(StopwatchWidget, mo):
 
 
 @app.cell
-def _(mo, stopwatch):
-    # format last updated as date
-    mo.md(f"""
-    **Stopwatch Status:**
-    - Elapsed time: {stopwatch.elapsed_time / 1000:.2f} seconds
-    - Is running: {stopwatch.is_running}
-    """)
+def _(stopwatch):
+    stopwatch.reset()
+    stopwatch.start()
     return
 
 

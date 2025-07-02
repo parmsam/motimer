@@ -41,6 +41,11 @@ timer_ui = mo.ui.anywidget(timer)
 # Set time programmatically
 timer.set_time(hours=0, minutes=2, seconds=30)
 
+# Control timer programmatically
+timer.start()  # Start the timer
+timer.stop()   # Pause the timer
+timer.reset()  # Reset to initial time
+
 # Set theme
 timer.theme = 'dark'  # 'light', 'dark', or 'auto'
 
@@ -60,6 +65,11 @@ from motimer import StopwatchWidget
 stopwatch = StopwatchWidget()
 stopwatch.theme = 'light'  # 'light', 'dark', or 'auto'
 stopwatch_ui = mo.ui.anywidget(stopwatch)
+
+# Control stopwatch programmatically
+stopwatch.start()  # Start the stopwatch
+stopwatch.stop()   # Pause the stopwatch  
+stopwatch.reset()  # Reset to 00:00.00
 
 # Display the widget
 stopwatch_ui
@@ -90,6 +100,7 @@ mo.md(f"""
 
 ### Timer Widget
 - **Customizable Duration**: Set initial time via constructor or `set_time()` method
+- **Programmatic Control**: Start, stop, and reset timer from Python code
 - **Audio Alerts**: Plays a beep sound when timer reaches zero
 - **Visual Feedback**: Modern gradient design with smooth animations
 - **Theme Support**: Adapts to light/dark themes
@@ -97,6 +108,7 @@ mo.md(f"""
 
 ### Stopwatch Widget  
 - **High Precision**: Tracks time in milliseconds with centisecond display
+- **Programmatic Control**: Start, stop, and reset stopwatch from Python code
 - **Start/Stop/Reset**: Full control over timing operations
 - **Real-time Updates**: Smooth 10ms update intervals for precise timing
 - **State Synchronization**: Elapsed time and running state accessible from Python
@@ -117,6 +129,9 @@ timer.theme          # str: 'light', 'dark', or 'auto'
 
 # Methods
 timer.set_time(hours=0, minutes=5, seconds=0)  # Set timer duration
+timer.start()         # Start the timer programmatically
+timer.stop()          # Stop/pause the timer programmatically  
+timer.reset()         # Reset timer to initial time
 ```
 
 ### StopwatchWidget
@@ -129,6 +144,11 @@ stopwatch.elapsed_time  # int: elapsed time in milliseconds
 stopwatch.is_running    # bool: whether stopwatch is active
 stopwatch.last_updated  # float: timestamp of last update
 stopwatch.theme        # str: 'light', 'dark', or 'auto'
+
+# Methods
+stopwatch.start()       # Start the stopwatch programmatically
+stopwatch.stop()        # Stop/pause the stopwatch programmatically
+stopwatch.reset()       # Reset stopwatch to 00:00.00
 ```
 
 ## License
