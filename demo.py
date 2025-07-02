@@ -1,10 +1,10 @@
 import marimo
 
 __generated_with = "0.14.8"
-app = marimo.App(width="columns")
+app = marimo.App()
 
 
-@app.cell(column=0)
+@app.cell
 def _():
     import marimo as mo
     import anywidget
@@ -19,16 +19,9 @@ def _(TimerWidget, mo):
     timer = TimerWidget(initial_time=600) # Will show 10 minutes
     timer.set_time(hours=0, minutes=0, seconds=10)  # Will now show 10 seconds 
     timer.theme = 'light'  
-    timer = mo.ui.anywidget(timer)
-    timer
+    timer_ui = mo.ui.anywidget(timer)
+    timer_ui
     return (timer,)
-
-
-@app.cell
-def _(timer):
-    timer.reset()
-    timer.start()
-    return
 
 
 @app.cell
@@ -48,20 +41,19 @@ def _(StopwatchWidget, mo):
     # Create and display the stopwatch widget
     stopwatch = StopwatchWidget()
     stopwatch.theme = "light"  # 'dark', 'light' or 'auto'
-    stopwatch = mo.ui.anywidget(stopwatch)
-    stopwatch
+    stopwatch_ui = mo.ui.anywidget(stopwatch)
+    stopwatch_ui
     return (stopwatch,)
 
 
 @app.cell
-def _(stopwatch):
-    stopwatch.reset()
-    stopwatch.start()
-    return
-
-
-@app.cell(column=1)
-def _():
+def _(mo, stopwatch):
+    # You can access the stopwatch's state from Python
+    mo.md(f"""
+    **Stopwatch Status:**
+    - Elapsed time: {stopwatch.elapsed_time / 1000:.2f} seconds
+    - Is running: {stopwatch.is_running}
+    """)
     return
 
 
