@@ -66,6 +66,13 @@ class StopwatchWidget(anywidget.AnyWidget):
             if (!intervalId) {
                 startTime = Date.now() - pausedTime;
                 intervalId = setInterval(() => {
+                    // Safety check - ensure we're still supposed to be running
+                    if (!model.get("is_running")) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        return;
+                    }
+                    
                     let elapsed = Date.now() - startTime;
                     
                     // Update display immediately (smooth UI)
@@ -99,7 +106,11 @@ class StopwatchWidget(anywidget.AnyWidget):
         
         // Reset stopwatch  
         function resetStopwatch() {
-            stopStopwatch();
+            // Always clear interval first
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
             pausedTime = 0;
             model.set("elapsed_time", 0);
             model.set("is_running", false);
@@ -112,8 +123,30 @@ class StopwatchWidget(anywidget.AnyWidget):
         stopBtn.addEventListener("click", stopStopwatch);
         resetBtn.addEventListener("click", resetStopwatch);
         
-        // Model change listener
-        model.on("change:elapsed_time", updateDisplay);
+        // Model change listeners
+        // Listen for programmatic start/stop/reset from Python
+        model.on("change:is_running", () => {
+            if (model.get("is_running") && !intervalId) {
+                // Start programmatically - sync pausedTime with model
+                pausedTime = model.get("elapsed_time");
+                startStopwatch();
+            } else if (!model.get("is_running") && intervalId) {
+                // Force stop - clear interval immediately
+                clearInterval(intervalId);
+                intervalId = null;
+                pausedTime = model.get("elapsed_time");
+            }
+        });
+        
+        // Listen for elapsed_time changes (for reset functionality)
+        model.on("change:elapsed_time", () => {
+            let elapsed = model.get("elapsed_time");
+            if (elapsed === 0 && !model.get("is_running")) {
+                // This is likely a reset - update pausedTime
+                pausedTime = 0;
+            }
+            updateDisplay();
+        });
         
         // Initial display
         updateDisplay();
@@ -125,6 +158,14 @@ class StopwatchWidget(anywidget.AnyWidget):
         buttonContainer.appendChild(resetBtn);
         container.appendChild(buttonContainer);
         el.appendChild(container);
+        
+        // Cleanup function to prevent memory leaks
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
     }
     export default { render };
     """
@@ -392,6 +433,27 @@ class StopwatchWidget(anywidget.AnyWidget):
     last_updated = traitlets.Float(0.0).tag(sync=True)  # Last update timestamp
     theme = traitlets.Unicode('auto').tag(sync=True)  # Theme preference: 'light', 'dark', 'auto'
     
+    def start(self):
+        """Start the stopwatch programmatically"""
+        if not self.is_running:
+            self.is_running = True
+    
+    def stop(self):
+        """Stop the stopwatch programmatically"""
+        if self.is_running:
+            self.is_running = False
+    
+    def reset(self):
+        """Reset the stopwatch programmatically"""
+        was_running = self.is_running
+        self.is_running = False
+        self.elapsed_time = 0
+        # If it was running, the state change will trigger the JS listener
+        # If it wasn't running, we still need to update the display
+        if not was_running:
+            # Force a state change to trigger frontend update
+            self.last_updated = __import__('time').time()
+    
 class TimerWidget(anywidget.AnyWidget):
     _esm = """
     function render({ model, el }) {
@@ -566,6 +628,13 @@ class TimerWidget(anywidget.AnyWidget):
                 if (totalSeconds > 0) {
                     endTime = Date.now() + (totalSeconds * 1000);
                     intervalId = setInterval(() => {
+                        // Safety check - ensure we're still supposed to be running
+                        if (!model.get("is_running")) {
+                            clearInterval(intervalId);
+                            intervalId = null;
+                            return;
+                        }
+                        
                         let now = Date.now();
                         let remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
                         
@@ -573,7 +642,10 @@ class TimerWidget(anywidget.AnyWidget):
                         model.save_changes();
                         
                         if (remaining === 0) {
-                            stopTimer();
+                            clearInterval(intervalId);
+                            intervalId = null;
+                            model.set("is_running", false);
+                            model.save_changes();
                             // Play sound and show alert when timer reaches zero
                             playBeep();
                             setTimeout(() => {
@@ -600,7 +672,11 @@ class TimerWidget(anywidget.AnyWidget):
         
         // Reset timer
         function resetTimer() {
-            stopTimer();
+            // Always clear interval first
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
             let totalSeconds = model.get("initial_time");
             model.set("remaining_time", totalSeconds);
             model.set("is_running", false);
@@ -636,9 +712,49 @@ class TimerWidget(anywidget.AnyWidget):
             }
         });
         
+        // Listen for programmatic start/stop/reset from Python
         model.on("change:is_running", () => {
-            // Update button states
             let isRunning = model.get("is_running");
+            
+            if (isRunning && !intervalId) {
+                // Start timer programmatically
+                let totalSeconds = model.get("remaining_time");
+                if (totalSeconds > 0) {
+                    endTime = Date.now() + (totalSeconds * 1000);
+                    intervalId = setInterval(() => {
+                        // Safety check - ensure we're still supposed to be running
+                        if (!model.get("is_running")) {
+                            clearInterval(intervalId);
+                            intervalId = null;
+                            return;
+                        }
+                        
+                        let now = Date.now();
+                        let remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
+                        
+                        model.set("remaining_time", remaining);
+                        model.save_changes();
+                        
+                        if (remaining === 0) {
+                            clearInterval(intervalId);
+                            intervalId = null;
+                            model.set("is_running", false);
+                            model.save_changes();
+                            // Play sound and show alert when timer reaches zero
+                            playBeep();
+                            setTimeout(() => {
+                                alert("⏰ Timer finished!");
+                            }, 100);
+                        }
+                    }, 100);
+                }
+            } else if (!isRunning && intervalId) {
+                // Stop timer programmatically - force clear
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            
+            // Update button states
             if (isRunning) {
                 startBtn.classList.add("disabled");
             } else {
@@ -1105,4 +1221,24 @@ class TimerWidget(anywidget.AnyWidget):
         total_seconds = hours * 3600 + minutes * 60 + seconds
         self.initial_time = total_seconds
         if not self.is_running:
-            self.remaining_time = total_seconds    
+            self.remaining_time = total_seconds
+    
+    def start(self):
+        """Start the timer programmatically"""
+        if not self.is_running and self.remaining_time > 0:
+            self.is_running = True
+    
+    def stop(self):
+        """Stop the timer programmatically"""
+        if self.is_running:
+            self.is_running = False
+    
+    def reset(self):
+        """Reset the timer programmatically"""
+        was_running = self.is_running
+        self.is_running = False
+        self.remaining_time = self.initial_time
+        # If it wasn't running, we still need to trigger an update
+        if not was_running:
+            # Force a state change to trigger frontend update
+            self.remaining_time = self.initial_time  # This will trigger the change event
