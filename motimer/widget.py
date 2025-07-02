@@ -85,10 +85,14 @@ class StopwatchWidget(anywidget.AnyWidget):
                     if (currentSeconds !== lastSeconds || elapsed % 100 < 10) {
                         model.set("elapsed_time", elapsed);
                         model.set("last_updated", Date.now()); 
-                        model.set("is_running", true);
+                        // Don't set is_running here to avoid recursive calls
                         model.save_changes();
                     }
                 }, 10);
+                    
+                // Set running state after starting interval
+                model.set("is_running", true);
+                model.save_changes();
             }
         }
         
@@ -129,7 +133,30 @@ class StopwatchWidget(anywidget.AnyWidget):
             if (model.get("is_running") && !intervalId) {
                 // Start programmatically - sync pausedTime with model
                 pausedTime = model.get("elapsed_time");
-                startStopwatch();
+                startTime = Date.now() - pausedTime;
+                intervalId = setInterval(() => {
+                    // Safety check - ensure we're still supposed to be running
+                    if (!model.get("is_running")) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        return;
+                    }
+                    
+                    let elapsed = Date.now() - startTime;
+                    
+                    // Update display immediately (smooth UI)
+                    display.innerHTML = formatTime(elapsed);
+                    
+                    // Only sync to Python every 100ms or when seconds change
+                    let currentSeconds = Math.floor(elapsed / 10);
+                    let lastSeconds = Math.floor(model.get("elapsed_time") / 10);
+                    
+                    if (currentSeconds !== lastSeconds || elapsed % 100 < 10) {
+                        model.set("elapsed_time", elapsed);
+                        model.set("last_updated", Date.now()); 
+                        model.save_changes();
+                    }
+                }, 10);
             } else if (!model.get("is_running") && intervalId) {
                 // Force stop - clear interval immediately
                 clearInterval(intervalId);

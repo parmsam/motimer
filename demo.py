@@ -19,8 +19,8 @@ def _(TimerWidget, mo):
     timer = TimerWidget(initial_time=600) # Will show 10 minutes
     timer.set_time(hours=0, minutes=0, seconds=10)  # Will now show 10 seconds 
     timer.theme = 'light'  
-    timer_ui = mo.ui.anywidget(timer)
-    timer_ui
+    timer = mo.ui.anywidget(timer)
+    timer
     return (timer,)
 
 
@@ -41,8 +41,8 @@ def _(StopwatchWidget, mo):
     # Create and display the stopwatch widget
     stopwatch = StopwatchWidget()
     stopwatch.theme = "light"  # 'dark', 'light' or 'auto'
-    stopwatch_ui = mo.ui.anywidget(stopwatch)
-    stopwatch_ui
+    stopwatch = mo.ui.anywidget(stopwatch)
+    stopwatch
     return (stopwatch,)
 
 
